@@ -426,7 +426,7 @@ class mission2{
 		}
 		
 		//site--;
-		cout<< idList[site].id[j]<<endl;
+		
 		idsite = j;
 		float one =-1;
 		for( i = 0; i < idList[site].id.size() ; i++)
@@ -434,10 +434,10 @@ class mission2{
 			
 			
 		findposition(position, idsite, site);
-		cout << position;
+		
 		min = idsite;
 		for( i = 0 ; i < idList[site].id.size() ; i++ ){
-			cout << "aa"<<endl;
+			
 			idList[site].visit.push_back( zero );
 			
 			if( strcmp( idList[site].id[i] ,inputID ) == 0 ){
@@ -451,13 +451,13 @@ class mission2{
 			for( temp = adjL[position].head ; temp != NULL ; temp = temp->next ){	
 			  if (strcmp(adjL[position].head->getID, idList[site].id[i] ) == 0)
 			    break ;	
-		      cout << "ll" ;
+		      
 			}
 			
 			if( temp == NULL)
 				idList[site].weight[i]  = -1;
 			else{  //中間有找到ID 
-				cout << "test";
+				
 				idList[site].weight[i] = temp->weight;
 				cout << idList[site].weight[i] << " gkgf"<<endl;
 				if( idList[site].visit[min] == 1 && idList[site].visit[i] == 0  ) { // 第一次設定 
@@ -473,7 +473,7 @@ class mission2{
 		idList[site].visit[min] = 1; //  設定為起點 
 		minnext = min;//設定下一次的起點 
 		while( test == 0){
-			cout << "b" <<endl;
+			
 			findposition(position, min, site );
 			for(temp = adjL[position].head ; temp != NULL ; temp = temp->next ){	//目前最小路徑的getID往後		
 				for( i = 0 ; i < idList[site].id.size() && strcmp(adjL[min].head->getID, idList[site].id[i] ) != 0 ; i++ ){// 去看是否有在idList 
@@ -502,7 +502,7 @@ class mission2{
 		
 		test = 0;
 		while( test == 0 ){
-			cout << "cc" <<endl; 
+			
 			for( i = 0; i < idList[site].id.size(); i++ ){
 				test = 1;
 				if( idList[site].weight[i] == -1 ){   //還是有沒跑到 
@@ -534,10 +534,10 @@ class mission2{
 		for( int i = 0 ; i < idList[site].id.size() ; i++ ){
 			for( int j = 0 ; j < idList[site].id.size() ; j++ ){
 				if( idList[site].weight[i] < idList[site].weight[j] ){
-					cout <<  idList[site].id[i] << "\t";
+					
 					swap( idList[site].weight[i] , idList[site].weight[j] );
 					swap( idList[site].id[i] , idList[site].id[j] );
-					cout <<  idList[site].id[i];
+					
 				}
 			}
 		}
@@ -551,9 +551,7 @@ class mission2{
 		fstream out ;
 		filename = "pairs" + filename + "_" + inputweight + ".ds" ;
 		out.open((filename).c_str(), ios::out) ;
-		for(i  = 0 ; i < idList[site].id.size() ; i++){
-			cout <<idList[site].id[i] << " " << idList[site].weight[i] << endl;
-		}
+		
 		if ( out ) {
 			out << "origin: " << inputID << "\n" ;
 			for( i = 0; i < idList[site].id.size() ; i++ ){
