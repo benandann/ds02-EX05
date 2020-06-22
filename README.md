@@ -1,4 +1,4 @@
-//請助教下載GitHub版本 
+//用github機測 
 //********************************************************************************/ 
 // DS2ex05_18_10727217陳炯瑋_10727223陳宇呈 
 //********************************************************************************/ 
@@ -46,6 +46,8 @@ typedef struct taLN {
 
 typedef struct Information {
 	vector<char*> id ;
+	vector<float> weight ;
+	vector<int> visit ;
 }Information;
 
 vector<studentPair> student ;
@@ -92,9 +94,9 @@ class mission0 {
 	
 	// *****************************************************************************// 
 	
-	void Graph(string filename, float inputwgt, string inputweight ) {
+	void Graph(string filename, float inputwgt ) {
 		fstream outfile ;
-		filename = "pairs" + filename + "_" + inputweight + ".adj" ;
+		filename = "pairs" + filename + ".adj" ;
 		outfile.open((filename).c_str(), ios::out) ;  
 		bool sameputID = false ;
 		bool samegetID = false ;
@@ -280,7 +282,7 @@ class mission1 {
 		} // for
 				
 		sort(idList);
-		printinformation( filename, idList, inputweight ) ;
+		printinformation(filename , idList, inputweight);
 	} // DFS
 	
 	void idsort(Information &temp){
@@ -314,8 +316,8 @@ class mission1 {
 				adjL[i].visited = true ;	
 				
 			} // if
-			adjListNode * run = NULL ;
-			for ( run = adjL[i].head ; run != NULL ; run = run->next ) {
+			
+			for ( adjListNode * run = adjL[i].head ; run != NULL ; run = run->next ) {
 				if ( strcmp( adjL[site].putID, run->getID ) == 0 ) {
 					run->visited = true ;
 				} // if
@@ -323,12 +325,12 @@ class mission1 {
 			} // for
 		} // for
 		
-		adjListNode * head = NULL ;
-		for ( head = adjL[site].head ; head != NULL ; head = head->next ) { 
+		for ( adjListNode * head = adjL[site].head ; head != NULL ; head = head->next ) { 
 			if ( head->visited == false ) {
 				for ( int i = 0 ; i < adjL.size() ; i++ ) {
 					if ( strcmp( adjL[i].putID, head->getID ) == 0 ) {
 						store.id.push_back( head->getID ) ;
+						
 						Recursion( adjL, i, store ) ;
 					} // if
 				} // for
@@ -389,41 +391,210 @@ class mission1 {
 
 };
 
-class mission2 {
+
+class mission2{
 	public:
+	void findposition(int &position, int idsite, int site){//找在adjL的位置 
+		bool test = false;
 		
-	void printAllid() {
-		int num = 0 ;
-		for ( int i = 0 ; i < adjL.size() ; i++ ) {
-			if ( ( num % 8 ) == 0 && num != 0 ) 
-				cout  << '\n' << '\t' ;
-			if ( num == 0 ) 
-				cout << '\t' ;
-			if ( num < 9)
-				cout << adjL[i].putID << "  " ;
-			else if ( num < 99)
-				cout << adjL[i].putID << "  " ;
-			else
-				cout << adjL[i].putID << "  " ;
-			num++ ;
-		} // for
-	} // printAllid
+		for( int i = 0 ; !test && i < idList[site].id.size() ; i++ ){//把 idlist的每個學號在adjL的位置放入position
+			for( int j = 0 ; j < adjL.size() ; j++ ){
+				if( adjL[j].putID == idList[site].id[idsite] ){
+					position = j;
+					test = true;
+					
+					break;
+				}
+			}
+		}
+	}
+	
+	void minstep( string inputweight, char inputID[10], string filename ) {
+		int i = 0, j= 0,test = 0;
+		int site = -1, idsite = -1 ;
+		int position = -1, min = 0,minnext = 0;
+		int zero = 0;
+		adjListNode * temp;
+		
+		for (i = 0; site == -1 && i < idList.size() ; i++ ){  //找到學號位置(idlist)
+			for( j =0; j < idList[i].id.size() ; j++){
+					if( strcmp( inputID , idList[i].id[j] ) == 0 ){  // 找到學號在idList中的位置 
+						site = i;
+						break;
+					}
+			}
+		}
+		
+		//site--;
+		cout<< idList[site].id[j]<<endl;
+		idsite = j;
+		float one =-1;
+		for( i = 0; i < idList[site].id.size() ; i++)
+			idList[site].weight.push_back(one) ;
+			
+			
+		findposition(position, idsite, site);
+		cout << position;
+		min = idsite;
+		for( i = 0 ; i < idList[site].id.size() ; i++ ){
+			cout << "aa"<<endl;
+			idList[site].visit.push_back( zero );
+			
+			if( strcmp( idList[site].id[i] ,inputID ) == 0 ){
+				
+				idList[site].visit[i] = 1;
+				idList[site].weight[i] = 0;
+				continue;
+			}
+			
+			
+			for( temp = adjL[position].head ; temp != NULL ; temp = temp->next ){	
+			  if (strcmp(adjL[position].head->getID, idList[site].id[i] ) == 0)
+			    break ;	
+		      cout << "ll" ;
+			}
+			
+			if( temp == NULL)
+				idList[site].weight[i]  = -1;
+			else{  //中間有找到ID 
+				cout << "test";
+				idList[site].weight[i] = temp->weight;
+				cout << idList[site].weight[i] << " gkgf"<<endl;
+				if( idList[site].visit[min] == 1 && idList[site].visit[i] == 0  ) { // 第一次設定 
+					min = i;
+				}
+				else if ( idList[site].visit[min] == 0 && idList[site].visit[i] == 0 && idList[site].weight[i] < idList[site].weight[min] ) { // 調整最小路徑 
+					min = i; 
+				}
+			}	
+		}
+		
+		
+		idList[site].visit[min] = 1; //  設定為起點 
+		minnext = min;//設定下一次的起點 
+		while( test == 0){
+			cout << "b" <<endl;
+			findposition(position, min, site );
+			for(temp = adjL[position].head ; temp != NULL ; temp = temp->next ){	//目前最小路徑的getID往後		
+				for( i = 0 ; i < idList[site].id.size() && strcmp(adjL[min].head->getID, idList[site].id[i] ) != 0 ; i++ ){// 去看是否有在idList 
+				}
+				if( i != idList[site].id.size() ) { 
+					if( idList[site].weight[i] > idList[site].weight[min] + temp->weight || idList[site].weight[i] == -1 ){ // 更改最短距離 
+						cout << "in";
+						idList[site].weight[i] =  idList[site].weight[min] + temp->weight;
+					}
+					if( idList[site].visit[minnext] == 1 && idList[site].visit[i] == 0 ){  //第一個先當新起點 
+						minnext = i;
+					} 
+					else if( idList[site].visit[minnext] == 0 && idList[site].visit[i] == 0 && idList[site].weight[i] < idList[site].weight[minnext] ){  //找新起點 
+						minnext = i;
+					}
+				}
+			}
+			if( idList[site].visit[minnext] == 1 ){  //全都走訪過了->>>>結束 
+				test = 1;
+			}
+			else{
+				idList[site].visit[minnext] = 1;//走訪過了 
+			}
+			min = minnext;
+		}
+		
+		test = 0;
+		while( test == 0 ){
+			cout << "cc" <<endl; 
+			for( i = 0; i < idList[site].id.size(); i++ ){
+				test = 1;
+				if( idList[site].weight[i] == -1 ){   //還是有沒跑到 
+					test = 0;
+					for( j = 0; j < idList[site].id.size(); j++ ){
+						findposition(position, j, site );
+						for( temp = adjL[position].head ; temp != NULL && strcmp(temp->getID , idList[site].id[i]) != 0 ; temp = temp->next ){							
+						}
+						if(temp != NULL && idList[site].weight[j] != -1 ){
+							if( idList[site].weight[i] == -1 ){
+								idList[site].weight[i] = idList[site].weight[j] + temp->weight;
+							}
+							else if( idList[site].weight[i] > idList[site].weight[j] + temp->weight){
+								idList[site].weight[i] = idList[site].weight[j] + temp->weight;
+							}	
+						}
+					}
+					if( idList[site].weight[i] != -1 )
+						idList[site].visit[i] = 1;
+				}
+			}
+		}
+		
+		weightsort(site);
+		printmis2information( inputID, inputweight, site , filename);
+	}
+	
+	void weightsort( int site ){
+		for( int i = 0 ; i < idList[site].id.size() ; i++ ){
+			for( int j = 0 ; j < idList[site].id.size() ; j++ ){
+				if( idList[site].weight[i] < idList[site].weight[j] ){
+					cout <<  idList[site].id[i] << "\t";
+					swap( idList[site].weight[i] , idList[site].weight[j] );
+					swap( idList[site].id[i] , idList[site].id[j] );
+					cout <<  idList[site].id[i];
+				}
+			}
+		}
+	}
 	
 	
+	
+	
+	void printmis2information( char inputID[10], string inputweight , int site , string filename) {
+		int num = 0, i = 0, j= 0;
+		fstream out ;
+		filename = "pairs" + filename + "_" + inputweight + ".ds" ;
+		out.open((filename).c_str(), ios::out) ;
+		for(i  = 0 ; i < idList[site].id.size() ; i++){
+			cout <<idList[site].id[i] << " " << idList[site].weight[i] << endl;
+		}
+		if ( out ) {
+			out << "origin: " << inputID << "\n" ;
+			for( i = 0; i < idList[site].id.size() ; i++ ){
+				if( strcmp( idList[site].id[i] , inputID) != 0){
+					if ( num < 10 ){
+						if( num %8 != 0 )
+							out << "( " << num << ")" << "\t" << idList[site].id[i] << ", " << idList[site].weight[i] << "\t" ;
+						if ( num == 9 )
+							out << "( " << num << ")" << "\t" << idList[site].id[i] << ", " << idList[site].weight[i] << "\n" ;
+					}
+					else if ( num >= 10) {					
+						if ( num % 8 != 0)
+							out << "(" << num << ")" << "\t" << idList[site].id[i] << ", " <<idList[site].weight[i] << "\t" ;
+						else 
+						 	out << "(" << num << ")" << "\t" << idList[site].id[i] << ", " << idList[site].weight[i] << "\n" ;
+					}
+				}
+			}
+		}
+		
+		for ( i = 0 ; i < idList.size() ; i++ ){
+			for( j = 0 ; j < idList[i].id.size() ; j++){
+				cout << idList[i].id[j] << "\t";
+			}
+		}
+	}
 };
 
 
 
+
 int main(int argc, char** argv) {
-	int num = 0 ;
+	int num = 0 ,i =0;
 	bool done = false ;
 	string filename ;
 	string inputweight;
-	char inputID[10] ;
 	float inputwgt = 0 ;
 	mission0 mis0 ;
 	mission1 mis1 ;
 	mission2 mis2 ;
+	char  inputID[10];
 	vector<Information> idList;
 	do {
 		cout << "******* Graph data applications ******" << endl ;
@@ -451,7 +622,7 @@ int main(int argc, char** argv) {
 		    	
 		    	mis0.Init() ;
 		    	mis0.readBinary( filename ) ;
-		    	mis0.Graph( filename, inputwgt, inputweight ) ;
+		    	mis0.Graph( filename, inputwgt ) ;
 			} // if 
 			else {
 				cout << "### It is NOT in (0,1] ###" ;
@@ -459,18 +630,14 @@ int main(int argc, char** argv) {
 		} // if
 		else if ( num == 1 ) {
 			mis1.DFS(filename, inputweight) ;
+			
 		} // else if
 		else if ( num == 2 ) {
-			mis2.printAllid() ;
-			while(true) {
-				cout << endl << "Input a student ID [0: exit] " ;
-				cin >> inputID ;
-				if( !strcmp( inputID, "0" ) )
-					return false ;
-				else 
-					break ;	
-			} // while
-			
+			for( i = 0 ; i < adjL.size() ; i++ ){
+				cout << adjL[i].putID << "  ";
+			}
+			cin >> inputID;
+			mis2.minstep( inputweight, inputID, filename );
 		} // esle if
 		else
 			done = true ;
